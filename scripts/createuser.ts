@@ -10,12 +10,12 @@ const USERS_FILE = path.join(DATA_DIR, "users.json");
 fs.ensureDirSync(DATA_DIR);
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, "[]");
 
-console.log("=== JTG Panel Owner User Creation ===");
+console.log("=== SHADOW Panel Owner User Creation ===");
 
 async function run() {
   const users = await fs.readJson(USERS_FILE);
-  const envUser = process.env.JTG_OWNER_USER;
-  const envPass = process.env.JTG_OWNER_PASS;
+  const envUser = process.env.SHADOW_OWNER_USER;
+  const envPass = process.env.SHADOW_OWNER_PASS;
 
   if (envUser && envPass) {
     await createOrUpdateOwner(users, envUser.trim(), envPass);

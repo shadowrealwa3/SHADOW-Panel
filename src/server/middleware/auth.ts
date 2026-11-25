@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-const JWT_SECRET = process.env.JWT_SECRET || "jtg-panel-super-secret";
+const JWT_SECRET = process.env.JWT_SECRET || "shadow-panel-super-secret";
 
 export const requireAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -12,7 +12,7 @@ export const requireAdmin = async (req: Request, res: Response, next: NextFuncti
   const token = authHeader.split(" ")[1];
 
   // API Key Authentication
-  if (token.startsWith("jtg-") || token.startsWith("jtg_")) {
+  if (token.startsWith("shadow-") || token.startsWith("shadow_")) {
     try {
       const { readJSON, writeJSON } = await import("../services/db.js");
       const apiKeys = await readJSON("api_keys.json") || [];
@@ -96,7 +96,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
   }
 
   // API Key Authentication
-  if (token.startsWith("jtg-") || token.startsWith("jtg_")) {
+  if (token.startsWith("shadow-") || token.startsWith("shadow_")) {
     try {
       const { readJSON, writeJSON } = await import("../services/db.js");
       const apiKeys = await readJSON("api_keys.json") || [];

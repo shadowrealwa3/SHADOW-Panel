@@ -1,4 +1,4 @@
-# JTG Panel — Changelog
+# SHADOW Panel — Changelog
 
 ## v3.0.0 Release (Master Production Update)
 - **Version Upgrade to v3.0.0**:
@@ -9,7 +9,7 @@
   - Refactored container creation, start, stop, kill, restart, status, stats, and logs methods in `src/server/services/docker.ts` to seamlessly handle both real Docker containers and local simulation fallbacks.
   - Added host data directory path resolution (`resolveHostDataDir`) for Docker-in-Docker / volume mapping on production hosts.
 - **Uninstaller & Cleanup Enhancements**:
-  - Added comprehensive `delete_jtg_directory` routine in `uninstall.sh` and `generate_scripts.py` to recursively and cleanly remove the `Jtg` working directory upon panel uninstallation.
+  - Added comprehensive `delete_shadow_directory` routine in `uninstall.sh` and `generate_scripts.py` to recursively and cleanly remove the `Shadow` working directory upon panel uninstallation.
 - **System Update Automation**:
   - Updated `update.sh` with seamless v3.0.0 migration logic and pre-update status validation.
 

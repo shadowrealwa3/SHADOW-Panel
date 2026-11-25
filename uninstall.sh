@@ -1,6 +1,6 @@
 #!/bin/bash
 # =========================================================
-# JTG Panel - Complete & Safe Uninstaller Script
+# SHADOW Panel - Complete & Safe Uninstaller Script
 # Cleans all servers, containers, PM2 processes, databases,
 # directories, and traces from the VPS.
 # =========================================================
@@ -33,13 +33,13 @@ if [ -f "package.json" ] && grep -q '"name": "react-example"' package.json 2>/de
     PANEL_ROOT="$(pwd)"
 elif [ -f "ecosystem.config.cjs" ] && [ -d "src" ]; then
     PANEL_ROOT="$(pwd)"
-elif [ -d "Jtg" ] && [ -f "Jtg/package.json" ]; then
-    PANEL_ROOT="$(cd Jtg && pwd)"
-elif [ -d "jtg" ] && [ -f "jtg/package.json" ]; then
-    PANEL_ROOT="$(cd jtg && pwd)"
+elif [ -d "Shadow" ] && [ -f "Shadow/package.json" ]; then
+    PANEL_ROOT="$(cd Shadow && pwd)"
+elif [ -d "shadow" ] && [ -f "shadow/package.json" ]; then
+    PANEL_ROOT="$(cd shadow && pwd)"
 else
     # Search common parent/sub directories
-    for cand in "$(pwd)" "$HOME/Jtg" "$HOME/jtg" "/root/Jtg" "/root/jtg" "/opt/Jtg" "/opt/jtg" "/var/www/Jtg"; do
+    for cand in "$(pwd)" "$HOME/Shadow" "$HOME/shadow" "/root/Shadow" "/root/shadow" "/opt/Shadow" "/opt/shadow" "/var/www/Shadow"; do
         if [ -f "$cand/ecosystem.config.cjs" ] || ([ -f "$cand/package.json" ] && [ -f "$cand/server.ts" ]); then
             PANEL_ROOT="$cand"
             break
@@ -55,7 +55,7 @@ print_banner() {
     fi
     echo -e "
   ${RED}${BOLD}╭──────────────────────────────────────────────────────────────╮
-  │  ${WHITE}██╗████████╗ ██████╗${RED}   ${BOLD}${WHITE}JTG PANEL UNINSTALLER${RED}                 │
+  │  ${WHITE}██╗████████╗ ██████╗${RED}   ${BOLD}${WHITE}SHADOW PANEL UNINSTALLER${RED}                 │
   │  ${WHITE}██║╚══██╔══╝██╔════╝${RED}   ${AMBER}Complete System Cleanup & Wipe${RED}         │
   ╰──────────────────────────────────────────────────────────────╯${NC}
 "
@@ -88,7 +88,7 @@ get_docker_cmd() {
 execute_step() {
     local msg="$1"
     shift
-    local step_id="jtg_uninst_$RANDOM"
+    local step_id="shadow_uninst_$RANDOM"
     local log_file="/tmp/${step_id}.log"
     rm -f "$log_file"
 
@@ -130,13 +130,13 @@ execute_step() {
 print_banner
 
 echo -e "  ${RED}${BOLD}┌── ATTENTION: PERMANENT WIPE ────────────────────────────────┐${NC}"
-echo -e "  ${RED}│${NC}  This action will permanently delete JTG Panel from this VPS: ${RED}│${NC}"
+echo -e "  ${RED}│${NC}  This action will permanently delete SHADOW Panel from this VPS: ${RED}│${NC}"
 echo -e "  ${RED}│${NC}                                                               ${RED}│${NC}"
 echo -e "  ${RED}│${NC}  ${WHITE}• Stop and remove all Minecraft server containers & processes${NC} ${RED}│${NC}"
 echo -e "  ${RED}│${NC}  ${WHITE}• Delete all server worlds, mods, plugins, configs & backups${NC}  ${RED}│${NC}"
 echo -e "  ${RED}│${NC}  ${WHITE}• Kill & unregister PM2 background services (6767, 3000)${NC}     ${RED}│${NC}"
 echo -e "  ${RED}│${NC}  ${WHITE}• Free SFTP (2022) and tunnel daemons (Playit)${NC}                ${RED}│${NC}"
-echo -e "  ${RED}│${NC}  ${WHITE}• Completely delete JTG Panel files from disk${NC}                 ${RED}│${NC}"
+echo -e "  ${RED}│${NC}  ${WHITE}• Completely delete SHADOW Panel files from disk${NC}                 ${RED}│${NC}"
 echo -e "  ${RED}│${NC}  ${WHITE}• Remove all cache, temporary scripts & logs from /tmp${NC}       ${RED}│${NC}"
 echo -e "  ${RED}│${NC}                                                               ${RED}│${NC}"
 echo -e "  ${RED}│${NC}  ${GRAY}Directory target:${NC} ${CYAN}${PANEL_ROOT}${NC}"
@@ -149,7 +149,7 @@ if [ "$1" = "-y" ] || [ "$1" = "--force" ] || [ "$NON_INTERACTIVE" = "true" ] ||
 elif [ ! -t 0 ]; then
     CONFIRM="1"
 else
-    echo -e "  ${YELLOW}${BOLD}[1]${NC} ${WHITE}${BOLD}Yes, completely uninstall and wipe JTG Panel${NC}"
+    echo -e "  ${YELLOW}${BOLD}[1]${NC} ${WHITE}${BOLD}Yes, completely uninstall and wipe SHADOW Panel${NC}"
     echo -e "  ${GREEN}${BOLD}[2]${NC} ${WHITE}${BOLD}No, cancel and keep my panel and servers${NC}"
     echo ""
     echo -ne "  ${AMBER}▶${NC} ${BOLD}Choose option [1-2]${NC}: "
@@ -173,17 +173,17 @@ stop_and_wipe_docker() {
     local DOCKER_CLI=$(get_docker_cmd)
     if command -v docker > /dev/null 2>&1; then
         # 1. Stop and remove panel containers
-        $DOCKER_CLI rm -f jtg-main jtg-admin jtg-panel 2>/dev/null || true
+        $DOCKER_CLI rm -f shadow-main shadow-admin shadow-panel 2>/dev/null || true
         
-        # 2. Stop and remove all Minecraft server containers created by JTG
+        # 2. Stop and remove all Minecraft server containers created by SHADOW
         local mc_containers=$($DOCKER_CLI ps -a --filter "name=mc-" --format "{{.Names}}" 2>/dev/null)
         if [ -n "$mc_containers" ]; then
             $DOCKER_CLI rm -f $mc_containers 2>/dev/null || true
         fi
 
-        local jtg_containers=$($DOCKER_CLI ps -a --filter "name=jtg" --format "{{.Names}}" 2>/dev/null)
-        if [ -n "$jtg_containers" ]; then
-            $DOCKER_CLI rm -f $jtg_containers 2>/dev/null || true
+        local shadow_containers=$($DOCKER_CLI ps -a --filter "name=shadow" --format "{{.Names}}" 2>/dev/null)
+        if [ -n "$shadow_containers" ]; then
+            $DOCKER_CLI rm -f $shadow_containers 2>/dev/null || true
         fi
 
         # 3. Bring down docker compose if file present
@@ -192,7 +192,7 @@ stop_and_wipe_docker() {
         fi
 
         # 4. Remove Docker network if created
-        $DOCKER_CLI network rm jtg-network jtg-panel_default 2>/dev/null || true
+        $DOCKER_CLI network rm shadow-network shadow-panel_default 2>/dev/null || true
     fi
     return 0
 }
@@ -201,8 +201,8 @@ execute_step "Terminating Minecraft & Docker containers" stop_and_wipe_docker
 # Step 2: Stop and unregister all PM2 services
 stop_and_wipe_pm2() {
     # Stop and delete panel processes
-    run_pm2 stop jtg-main jtg-admin jtg-panel 2>/dev/null || true
-    run_pm2 delete jtg-main jtg-admin jtg-panel 2>/dev/null || true
+    run_pm2 stop shadow-main shadow-admin shadow-panel 2>/dev/null || true
+    run_pm2 delete shadow-main shadow-admin shadow-panel 2>/dev/null || true
     run_pm2 save --force 2>/dev/null || true
     run_pm2 cleardump 2>/dev/null || true
     return 0
@@ -211,11 +211,11 @@ execute_step "Stopping & clearing PM2 services" stop_and_wipe_pm2
 
 # Step 3: Terminate local Minecraft / Java / Playit processes and free ports
 terminate_processes_and_ports() {
-    # Kill any Playit tunnel daemon associated with JTG
+    # Kill any Playit tunnel daemon associated with SHADOW
     pkill -9 -f "playit" 2>/dev/null || true
     pkill -9 -f "playit-cli" 2>/dev/null || true
 
-    # Kill any local Java instances running from JTG server directories
+    # Kill any local Java instances running from SHADOW server directories
     if [ -n "$PANEL_ROOT" ]; then
         pkill -9 -f "$PANEL_ROOT" 2>/dev/null || true
     fi
@@ -234,26 +234,26 @@ execute_step "Releasing ports (6767, 3000, 2022 SFTP)" terminate_processes_and_p
 
 # Step 4: Clean up standalone JRE & temporary files
 clean_temp_and_runtime() {
-    # If JTG standalone Adoptium JRE was installed in /opt/jtg-java, clean it
-    if [ -d "/opt/jtg-java" ]; then
+    # If SHADOW standalone Adoptium JRE was installed in /opt/shadow-java, clean it
+    if [ -d "/opt/shadow-java" ]; then
         # Check if /usr/local/bin/java symlink points to it
         if [ -L "/usr/local/bin/java" ]; then
             local target=$(readlink -f /usr/local/bin/java 2>/dev/null || echo "")
             case "$target" in
-                *"/opt/jtg-java"*) rm -f /usr/local/bin/java 2>/dev/null || true ;;
+                *"/opt/shadow-java"*) rm -f /usr/local/bin/java 2>/dev/null || true ;;
             esac
         fi
-        rm -rf /opt/jtg-java 2>/dev/null || sudo rm -rf /opt/jtg-java 2>/dev/null || true
+        rm -rf /opt/shadow-java 2>/dev/null || sudo rm -rf /opt/shadow-java 2>/dev/null || true
     fi
 
-    # Clean /tmp logs and caches created by JTG
-    rm -f /tmp/jtg_* /tmp/jtg-*.log /tmp/jtg_update.log /tmp/jtg_jre.tar.gz /tmp/node22.tar.xz 2>/dev/null || true
+    # Clean /tmp logs and caches created by SHADOW
+    rm -f /tmp/shadow_* /tmp/shadow-*.log /tmp/shadow_update.log /tmp/shadow_jre.tar.gz /tmp/node22.tar.xz 2>/dev/null || true
     return 0
 }
 execute_step "Purging runtime caches & temp logs" clean_temp_and_runtime
 
-# Step 5: Completely delete the JTG Panel directory, servers, and databases
-delete_jtg_directories() {
+# Step 5: Completely delete the SHADOW Panel directory, servers, and databases
+delete_shadow_directories() {
     local dirs_to_remove=()
 
     # Add verified panel directory
@@ -262,7 +262,7 @@ delete_jtg_directories() {
     fi
 
     # Check for known common paths
-    for p in "$ORIGINAL_CALL_DIR/Jtg" "$ORIGINAL_CALL_DIR/jtg" "$HOME/Jtg" "$HOME/jtg" "/root/Jtg" "/root/jtg" "/opt/Jtg" "/opt/jtg"; do
+    for p in "$ORIGINAL_CALL_DIR/Shadow" "$ORIGINAL_CALL_DIR/shadow" "$HOME/Shadow" "$HOME/shadow" "/root/Shadow" "/root/shadow" "/opt/Shadow" "/opt/shadow"; do
         if [ -d "$p" ]; then
             dirs_to_remove+=("$p")
         fi
@@ -289,7 +289,7 @@ delete_jtg_directories() {
     done
     return 0
 }
-execute_step "Wiping panel files & Minecraft worlds" delete_jtg_directories
+execute_step "Wiping panel files & Minecraft worlds" delete_shadow_directories
 
 echo -e "  ${AMBER}│${NC}"
 echo -e "  ${AMBER}╰──────────────────────────────────────────────────────────────╯${NC}"
@@ -297,14 +297,14 @@ echo ""
 
 # Final Success Banner
 echo -e "  ${GREEN}${BOLD}╭──────────────────────────────────────────────────────────────╮
-  │  ✔  JTG PANEL COMPLETELY UNINSTALLED & PURGED                │
+  │  ✔  SHADOW PANEL COMPLETELY UNINSTALLED & PURGED                │
   ├──────────────────────────────────────────────────────────────┤${NC}
   │  • All Minecraft servers and processes safely stopped        │
   │  • All Docker containers, PM2 processes and ports released   │
   │  • All worlds, configs, databases and backups deleted        │
-  │  • JTG Panel directory and temporary files erased            │
+  │  • SHADOW Panel directory and temporary files erased            │
   │                                                              │
-  │  ${WHITE}VPS is now 100% clean with no leftover JTG traces.${NC}         │
+  │  ${WHITE}VPS is now 100% clean with no leftover SHADOW traces.${NC}         │
   ${GREEN}${BOLD}╰──────────────────────────────────────────────────────────────╯${NC}"
 echo ""
 

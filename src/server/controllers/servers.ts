@@ -210,13 +210,13 @@ export const createServer = async (req: Request, res: Response) => {
       const indexPath = path.join(serverDir, "index.js");
       const pkgPath = path.join(serverDir, "package.json");
       if (!fs.existsSync(indexPath)) {
-        await fs.writeFile(indexPath, `// Node.js Application on JTG Panel\nconst http = require('http');\nconst port = process.env.PORT || process.env.SERVER_PORT || ${port};\n\nconsole.log('==============================================');\nconsole.log('🚀 Node.js Application Running on port ' + port);\nconsole.log('Node Version: ' + process.version);\nconsole.log('Upload your files in File Manager to customize!');\nconsole.log('==============================================');\n\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'application/json' });\n  res.end(JSON.stringify({\n    status: 'online',\n    runtime: 'node.js',\n    time: new Date().toISOString()\n  }));\n});\n\nserver.listen(port, '0.0.0.0', () => {\n  console.log(\`[Server] Listening on http://0.0.0.0:\${port}\`);\n});\n`);
+        await fs.writeFile(indexPath, `// Node.js Application on SHADOW Panel\nconst http = require('http');\nconst port = process.env.PORT || process.env.SERVER_PORT || ${port};\n\nconsole.log('==============================================');\nconsole.log('🚀 Node.js Application Running on port ' + port);\nconsole.log('Node Version: ' + process.version);\nconsole.log('Upload your files in File Manager to customize!');\nconsole.log('==============================================');\n\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'application/json' });\n  res.end(JSON.stringify({\n    status: 'online',\n    runtime: 'node.js',\n    time: new Date().toISOString()\n  }));\n});\n\nserver.listen(port, '0.0.0.0', () => {\n  console.log(\`[Server] Listening on http://0.0.0.0:\${port}\`);\n});\n`);
       }
       if (!fs.existsSync(pkgPath)) {
         await fs.writeFile(pkgPath, JSON.stringify({
           name: name.toLowerCase().replace(/[^a-z0-9_-]/g, '-') || "node-app",
           version: "1.0.0",
-          description: "Node.js application hosted on JTG Panel",
+          description: "Node.js application hosted on SHADOW Panel",
           main: "index.js",
           scripts: {
             "start": "node index.js"
@@ -228,7 +228,7 @@ export const createServer = async (req: Request, res: Response) => {
       const mainPath = path.join(serverDir, "main.py");
       const reqPath = path.join(serverDir, "requirements.txt");
       if (!fs.existsSync(mainPath)) {
-        await fs.writeFile(mainPath, `# Python Application on JTG Panel\nimport os\nimport sys\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nport = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", ${port})))\n\nprint("==============================================", flush=True)\nprint("🐍 Python Application Running", flush=True)\nprint(f"Python Version: {sys.version}", flush=True)\nprint(f"Listening Port: {port}", flush=True)\nprint("Upload your files in File Manager to customize!", flush=True)\nprint("==============================================", flush=True)\n\nclass RequestHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header('Content-type', 'application/json')\n        self.end_headers()\n        self.wfile.write(b'{"status": "online", "runtime": "python"}')\n\n    def log_message(self, format, *args):\n        print(f"[{self.log_date_time_string()}] {format % args}", flush=True)\n\nserver = HTTPServer(('0.0.0.0', port), RequestHandler)\nprint(f"[Server] Listening on http://0.0.0.0:{port}", flush=True)\n\ntry:\n    server.serve_forever()\nexcept KeyboardInterrupt:\n    print("\\nStopping server...", flush=True)\n    server.server_close()\n`);
+        await fs.writeFile(mainPath, `# Python Application on SHADOW Panel\nimport os\nimport sys\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nport = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", ${port})))\n\nprint("==============================================", flush=True)\nprint("🐍 Python Application Running", flush=True)\nprint(f"Python Version: {sys.version}", flush=True)\nprint(f"Listening Port: {port}", flush=True)\nprint("Upload your files in File Manager to customize!", flush=True)\nprint("==============================================", flush=True)\n\nclass RequestHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header('Content-type', 'application/json')\n        self.end_headers()\n        self.wfile.write(b'{"status": "online", "runtime": "python"}')\n\n    def log_message(self, format, *args):\n        print(f"[{self.log_date_time_string()}] {format % args}", flush=True)\n\nserver = HTTPServer(('0.0.0.0', port), RequestHandler)\nprint(f"[Server] Listening on http://0.0.0.0:{port}", flush=True)\n\ntry:\n    server.serve_forever()\nexcept KeyboardInterrupt:\n    print("\\nStopping server...", flush=True)\n    server.server_close()\n`);
       }
       if (!fs.existsSync(reqPath)) {
         await fs.writeFile(reqPath, "# Add python dependencies here\n");
@@ -241,7 +241,7 @@ export const createServer = async (req: Request, res: Response) => {
       }
       const propsPath = path.join(serverDir, "server.properties");
       if (!fs.existsSync(propsPath)) {
-        await fs.writeFile(propsPath, `server-port=${port}\nquery.port=${port}\nenable-rcon=true\nrcon.port=${parseInt(port) + 10}\nrcon.password=admin\nmotd=A Minecraft Server on JTG Panel\n`);
+        await fs.writeFile(propsPath, `server-port=${port}\nquery.port=${port}\nenable-rcon=true\nrcon.port=${parseInt(port) + 10}\nrcon.password=admin\nmotd=A Minecraft Server on SHADOW Panel\n`);
       }
       const jarPath = path.join(serverDir, "server.jar");
       if (!fs.existsSync(jarPath)) {
@@ -1383,7 +1383,7 @@ const downloadFileSafely = async (downloadUrl: string, targetDir: string, filena
       responseType: "stream",
       timeout: 60000,
       headers: {
-        "User-Agent": "JTG-Panel/1.0 (Minecraft Server Manager)"
+        "User-Agent": "SHADOW-Panel/1.0 (Minecraft Server Manager)"
       }
     });
 
@@ -1432,7 +1432,7 @@ const resolveModrinthVersionAndFile = async (
   // 2. If a specific version was chosen by the user
   if (specificVersionId) {
     const vRes = await axios.get(`https://api.modrinth.com/v2/version/${specificVersionId}`, {
-      headers: { "User-Agent": "JTG-Panel/1.0" }
+      headers: { "User-Agent": "SHADOW-Panel/1.0" }
     });
     if (vRes.data && vRes.data.files && vRes.data.files.length > 0) {
       const file = vRes.data.files.find((f: any) => f.primary) ||
@@ -1458,7 +1458,7 @@ const resolveModrinthVersionAndFile = async (
   }
 
   const verRes = await axios.get(`https://api.modrinth.com/v2/project/${projectId}/version`, {
-    headers: { "User-Agent": "JTG-Panel/1.0" }
+    headers: { "User-Agent": "SHADOW-Panel/1.0" }
   });
 
   const versions = verRes.data;
@@ -1771,7 +1771,7 @@ export const getModrinthProjectVersions = async (req: Request, res: Response) =>
 
   try {
     const resp = await axios.get(`https://api.modrinth.com/v2/project/${projectId}/version`, {
-      headers: { "User-Agent": "JTG-Panel/1.0" },
+      headers: { "User-Agent": "SHADOW-Panel/1.0" },
       timeout: 15000
     });
     res.json(resp.data);

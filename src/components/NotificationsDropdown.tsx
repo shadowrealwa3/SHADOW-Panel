@@ -47,7 +47,7 @@ export default function NotificationsDropdown() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
     try {
-      const saved = localStorage.getItem("jtg_notifications");
+      const saved = localStorage.getItem("shadow_notifications");
       return saved ? JSON.parse(saved) : DEFAULT_NOTIFICATIONS;
     } catch {
       return DEFAULT_NOTIFICATIONS;
@@ -58,7 +58,7 @@ export default function NotificationsDropdown() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.setItem("jtg_notifications", JSON.stringify(notifications));
+    localStorage.setItem("shadow_notifications", JSON.stringify(notifications));
   }, [notifications]);
 
   // Close dropdown on click outside or Escape

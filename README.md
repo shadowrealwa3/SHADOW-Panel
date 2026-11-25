@@ -1,6 +1,6 @@
 # SHADOW Panel
 
-SHADOW Panel — a rebrand of JTG Panel by JishnuTheGamer
+SHADOW Panel
 
 ## Quick Automated Setup (Recommended)
 
@@ -23,8 +23,8 @@ Menu Options:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/JishnuTheGamer/Jtg.git
-   cd Jtg
+   git clone https://github.com/shadowrealwa3/SHADOW-Panel.git
+   cd SHADOW-Panel
    ```
 
 2. Install dependencies:

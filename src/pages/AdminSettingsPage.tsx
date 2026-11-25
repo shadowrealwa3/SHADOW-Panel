@@ -845,7 +845,7 @@ export default function AdminSettingsPage(): React.ReactElement {
                                 setNewDefaultRuntime("docker");
                                 if (setDefaultRuntime) setDefaultRuntime("docker");
                                 try {
-                                  const token = localStorage.getItem("jtg_token") || localStorage.getItem("token");
+                                  const token = localStorage.getItem("shadow_token") || localStorage.getItem("token");
                                   const headers: any = {};
                                   if (token) headers["Authorization"] = `Bearer ${token}`;
                                   await axios.put("/api/system/settings", { defaultRuntime: "docker" }, { headers });
@@ -904,7 +904,7 @@ export default function AdminSettingsPage(): React.ReactElement {
                                 setNewDefaultRuntime("local");
                                 if (setDefaultRuntime) setDefaultRuntime("local");
                                 try {
-                                  const token = localStorage.getItem("jtg_token") || localStorage.getItem("token");
+                                  const token = localStorage.getItem("shadow_token") || localStorage.getItem("token");
                                   const headers: any = {};
                                   if (token) headers["Authorization"] = `Bearer ${token}`;
                                   await axios.put("/api/system/settings", { defaultRuntime: "local" }, { headers });

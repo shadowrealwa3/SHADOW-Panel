@@ -1,6 +1,6 @@
 #!/bin/bash
 # =========================================================
-# JTG Panel - Automated Installation & Management Script
+# SHADOW Panel - Automated Installation & Management Script
 # =========================================================
 
 # Ensure running in bash
@@ -30,8 +30,8 @@ DIM='\033[2m'
 NC='\033[0m'
 
 # Ensure initial tools exist if cloning is needed
-if [ ! -f "package.json" ] && [ ! -f "Jtg/package.json" ]; then
-    echo -e "  \033[38;5;51m⚡ Initializing JTG Panel files...\033[0m"
+if [ ! -f "package.json" ] && [ ! -f "SHADOW-Panel/package.json" ]; then
+    echo -e "  \033[38;5;51m⚡ Initializing SHADOW Panel files...\033[0m"
     if ! command -v git > /dev/null 2>&1 || ! command -v curl > /dev/null 2>&1; then
         if command -v apt-get > /dev/null 2>&1; then
             (export DEBIAN_FRONTEND=noninteractive; apt-get update -y -q > /dev/null 2>&1 || sudo apt-get update -y -q > /dev/null 2>&1 || true)
@@ -42,13 +42,13 @@ if [ ! -f "package.json" ] && [ ! -f "Jtg/package.json" ]; then
             (dnf install -y git curl tar ca-certificates > /dev/null 2>&1 || sudo dnf install -y git curl tar ca-certificates > /dev/null 2>&1 || true)
         fi
     fi
-    git clone https://github.com/JishnuTheGamer/Jtg Jtg 2>/dev/null || git clone https://github.com/JishnuTheGamer/Jtg.git Jtg 2>/dev/null || true
+    git clone https://github.com/shadowrealwa3/SHADOW-Panel SHADOW-Panel 2>/dev/null || git clone https://github.com/shadowrealwa3/SHADOW-Panel.git SHADOW-Panel 2>/dev/null || true
 fi
 
 if [ -f "package.json" ]; then
     WORK_DIR="."
-elif [ -d "Jtg" ] && [ -f "Jtg/package.json" ]; then
-    WORK_DIR="Jtg"
+elif [ -d "SHADOW-Panel" ] && [ -f "SHADOW-Panel/package.json" ]; then
+    WORK_DIR="SHADOW-Panel"
 else
     WORK_DIR="."
 fi
@@ -113,9 +113,9 @@ detect_sys_meta() {
         SYS_STATE="${GREEN}● ONLINE (:6767)${NC}"
     elif check_port_active 3000; then
         SYS_STATE="${CYAN}● DEV MODE (:3000)${NC}"
-    elif run_pm2 list 2>/dev/null | grep -q "jtg-main.*online"; then
+    elif run_pm2 list 2>/dev/null | grep -q "shadow-main.*online"; then
         SYS_STATE="${GREEN}● ONLINE (:6767)${NC}"
-    elif run_pm2 list 2>/dev/null | grep -q "jtg-admin.*online"; then
+    elif run_pm2 list 2>/dev/null | grep -q "shadow-admin.*online"; then
         SYS_STATE="${CYAN}● DEV MODE (:3000)${NC}"
     fi
 }
@@ -127,7 +127,7 @@ print_banner() {
     detect_sys_meta
     echo -e "
   ${EMERALD}${BOLD}╭──────────────────────────────────────────────────────────────╮
-  │  ${WHITE}██╗████████╗ ██████╗${EMERALD}   ${BOLD}${WHITE}JTG CONTROL PANEL${EMERALD}                     │
+  │  ${WHITE}██╗████████╗ ██████╗${EMERALD}   ${BOLD}${WHITE}SHADOW CONTROL PANEL${EMERALD}                     │
   │  ${WHITE}██║╚══██╔══╝██╔════╝${EMERALD}   ${CYAN}Next-Gen Minecraft Server Manager${EMERALD}          │
   │  ${WHITE}██║   ██║   ██║  ███╗${EMERALD}  ${AMBER}v3.0.0${NC}${EMERALD} · ${GREEN}Production Ready${EMERALD}                      │
   ├──────────────────────────────────────────────────────────────┤
@@ -190,7 +190,7 @@ run_root() {
 execute_step() {
     local msg="$1"
     shift
-    local step_id="jtg_step_$RANDOM"
+    local step_id="shadow_step_$RANDOM"
     local log_file="/tmp/${step_id}.log"
     rm -f "$log_file"
     
@@ -434,7 +434,7 @@ install_java() {
                 /usr/lib/jvm/java-11-openjdk-*/bin/java \
                 /usr/lib/jvm/*-openjdk*/bin/java \
                 /opt/java/bin/java \
-                /opt/jtg-java/bin/java \
+                /opt/shadow-java/bin/java \
                 /usr/local/java/bin/java; do
         if [ -x "$cand" ]; then
             echo "Found existing JVM at: $cand"
@@ -531,29 +531,29 @@ install_java() {
     if [ -n "$ADOPT_ARCH" ] && command -v curl > /dev/null 2>&1; then
         echo "Attempting fast binary runtime fetch..."
         local JRE_URL="https://api.adoptium.net/v3/binary/latest/21/ga/linux/${ADOPT_ARCH}/jre/hotspot/normal/eclipse"
-        curl -fsSL --connect-timeout 8 --max-time 45 "$JRE_URL" -o /tmp/jtg_jre.tar.gz > /dev/null 2>&1 || true
-        if [ -f "/tmp/jtg_jre.tar.gz" ] && [ -s "/tmp/jtg_jre.tar.gz" ]; then
+        curl -fsSL --connect-timeout 8 --max-time 45 "$JRE_URL" -o /tmp/shadow_jre.tar.gz > /dev/null 2>&1 || true
+        if [ -f "/tmp/shadow_jre.tar.gz" ] && [ -s "/tmp/shadow_jre.tar.gz" ]; then
             if [ "$EUID" -eq 0 ]; then
-                mkdir -p /opt/jtg-java
-                tar -xzf /tmp/jtg_jre.tar.gz -C /opt/jtg-java --strip-components=1 > /dev/null 2>&1 || true
-                if [ -x "/opt/jtg-java/bin/java" ]; then
-                    ln -sf /opt/jtg-java/bin/java /usr/local/bin/java 2>/dev/null || true
+                mkdir -p /opt/shadow-java
+                tar -xzf /tmp/shadow_jre.tar.gz -C /opt/shadow-java --strip-components=1 > /dev/null 2>&1 || true
+                if [ -x "/opt/shadow-java/bin/java" ]; then
+                    ln -sf /opt/shadow-java/bin/java /usr/local/bin/java 2>/dev/null || true
                 fi
             elif command -v sudo > /dev/null 2>&1; then
-                sudo mkdir -p /opt/jtg-java
-                sudo tar -xzf /tmp/jtg_jre.tar.gz -C /opt/jtg-java --strip-components=1 > /dev/null 2>&1 || true
-                if [ -x "/opt/jtg-java/bin/java" ]; then
-                    sudo ln -sf /opt/jtg-java/bin/java /usr/local/bin/java 2>/dev/null || true
+                sudo mkdir -p /opt/shadow-java
+                sudo tar -xzf /tmp/shadow_jre.tar.gz -C /opt/shadow-java --strip-components=1 > /dev/null 2>&1 || true
+                if [ -x "/opt/shadow-java/bin/java" ]; then
+                    sudo ln -sf /opt/shadow-java/bin/java /usr/local/bin/java 2>/dev/null || true
                 fi
             fi
-            rm -f /tmp/jtg_jre.tar.gz 2>/dev/null || true
+            rm -f /tmp/shadow_jre.tar.gz 2>/dev/null || true
             export PATH="/usr/local/bin:$PATH"
             if command -v java > /dev/null 2>&1; then
                 echo "Java OpenJDK runtime installed successfully."
                 return 0
             fi
         fi
-        rm -f /tmp/jtg_jre.tar.gz 2>/dev/null || true
+        rm -f /tmp/shadow_jre.tar.gz 2>/dev/null || true
     fi
 
     echo "Notice: Host Java setup completed with container fallback."
@@ -579,9 +579,9 @@ EOF2
         cat << 'EOF2' > docker-compose.yml
 version: '3.8'
 services:
-  jtg-main:
+  shadow-main:
     build: .
-    container_name: jtg-main
+    container_name: shadow-main
     restart: unless-stopped
     ports:
       - "6767:6767"
@@ -589,17 +589,17 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=6767
-      - JTG_HOST_DATA_PATH=${PWD}/.data
-      - JTG_OWNER_USER=${JTG_OWNER_USER:-}
-      - JTG_OWNER_PASS=${JTG_OWNER_PASS:-}
+      - SHADOW_HOST_DATA_PATH=${PWD}/.data
+      - SHADOW_OWNER_USER=${SHADOW_OWNER_USER:-}
+      - SHADOW_OWNER_PASS=${SHADOW_OWNER_PASS:-}
     volumes:
       - ./.data:/app/.data
       - ./backups:/app/backups
       - /var/run/docker.sock:/var/run/docker.sock
 
-  jtg-admin:
+  shadow-admin:
     build: .
-    container_name: jtg-admin
+    container_name: shadow-admin
     restart: unless-stopped
     command: npm run dev
     ports:
@@ -608,9 +608,9 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - JTG_HOST_DATA_PATH=${PWD}/.data
-      - JTG_OWNER_USER=${JTG_OWNER_USER:-}
-      - JTG_OWNER_PASS=${JTG_OWNER_PASS:-}
+      - SHADOW_HOST_DATA_PATH=${PWD}/.data
+      - SHADOW_OWNER_USER=${SHADOW_OWNER_USER:-}
+      - SHADOW_OWNER_PASS=${SHADOW_OWNER_PASS:-}
     volumes:
       - ./.data:/app/.data
       - ./backups:/app/backups
@@ -659,7 +659,7 @@ setup_node_env() {
 module.exports = {
   apps: [
     {
-      name: "jtg-main",
+      name: "shadow-main",
       script: "npm",
       args: "start",
       instances: 1,
@@ -675,7 +675,7 @@ module.exports = {
       }
     },
     {
-      name: "jtg-admin",
+      name: "shadow-admin",
       script: "npm",
       args: "run dev",
       instances: 1,
@@ -725,10 +725,10 @@ setup_owner() {
 
 setup_owner_docker() {
     local TARGET=$1
-    if [ -n "$JTG_OWNER_USER" ] && [ -n "$JTG_OWNER_PASS" ]; then
+    if [ -n "$SHADOW_OWNER_USER" ] && [ -n "$SHADOW_OWNER_PASS" ]; then
         local DOCKER_CLI=$(get_docker_cmd)
         sleep 2
-        $DOCKER_CLI exec -e JTG_OWNER_USER="$JTG_OWNER_USER" -e JTG_OWNER_PASS="$JTG_OWNER_PASS" "$TARGET" npm run createuser 2>&1 || {
+        $DOCKER_CLI exec -e SHADOW_OWNER_USER="$SHADOW_OWNER_USER" -e SHADOW_OWNER_PASS="$SHADOW_OWNER_PASS" "$TARGET" npm run createuser 2>&1 || {
             if command -v node &> /dev/null && [ -f "scripts/createuser.ts" ] && [ -d "node_modules" ]; then
                 npm run createuser 2>&1 || true
             fi
@@ -759,8 +759,8 @@ start_panel_docker() {
     # Free up port from PM2 if it was previously running under local Node.js
     if command -v pm2 &> /dev/null || [ -f "node_modules/.bin/pm2" ]; then
         run_pm2 delete "$TARGET" > /dev/null 2>&1 || true
-        if [ "$TARGET" = "jtg-main" ]; then
-            run_pm2 delete "jtg-panel" > /dev/null 2>&1 || true
+        if [ "$TARGET" = "shadow-main" ]; then
+            run_pm2 delete "shadow-panel" > /dev/null 2>&1 || true
         fi
     fi
 
@@ -811,11 +811,11 @@ start_panel_docker() {
 
 start_panel_node() {
     local TARGET=$1
-    if [ "$TARGET" = "jtg-main" ]; then
-        run_pm2 delete jtg-panel 2>/dev/null || true
+    if [ "$TARGET" = "shadow-main" ]; then
+        run_pm2 delete shadow-panel 2>/dev/null || true
         # Clean up conflicting Docker container if previously running via Docker
         local DOCKER_CLI=$(get_docker_cmd)
-        $DOCKER_CLI rm -f jtg-main jtg-panel 2>/dev/null || true
+        $DOCKER_CLI rm -f shadow-main shadow-panel 2>/dev/null || true
     fi
     # Ensure Docker daemon is running and socket accessible for Minecraft containers
     if command -v systemctl &> /dev/null; then
@@ -898,11 +898,11 @@ show_status() {
     local DEV_STATUS="${RED}● OFFLINE${NC}"
     local SFTP_STATUS="${RED}● OFFLINE${NC}"
     
-    if check_port_active 6767 || (run_pm2 list 2>/dev/null | grep "jtg-main" | grep -q "online") || (command -v docker &> /dev/null && docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^jtg-main$"); then
+    if check_port_active 6767 || (run_pm2 list 2>/dev/null | grep "shadow-main" | grep -q "online") || (command -v docker &> /dev/null && docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^shadow-main$"); then
         MAIN_STATUS="${GREEN}● ONLINE${NC}"
     fi
     
-    if check_port_active 3000 || (run_pm2 list 2>/dev/null | grep "jtg-admin" | grep -q "online") || (command -v docker &> /dev/null && docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^jtg-admin$"); then
+    if check_port_active 3000 || (run_pm2 list 2>/dev/null | grep "shadow-admin" | grep -q "online") || (command -v docker &> /dev/null && docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^shadow-admin$"); then
         DEV_STATUS="${GREEN}● ONLINE${NC}"
     fi
     
@@ -912,7 +912,7 @@ show_status() {
     
     echo ""
     echo -e "  ${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════╗"
-    echo -e "  ║                    JTG PANEL LIVE STATUS                     ║"
+    echo -e "  ║                    SHADOW PANEL LIVE STATUS                     ║"
     echo -e "  ╠══════════════════════════════════════════════════════════════╣${NC}"
     echo -e "  ║                                                              ║"
     echo -e "  ║  • Main Panel       : ${MAIN_STATUS} ${CYAN}http://${SYS_IP}:6767${NC}"
@@ -929,12 +929,12 @@ install_panel() {
     local TARGET=$1
     local PANEL_NAME="Main Panel"
     local PORT="6767"
-    local SERVICE_NAME="jtg-main"
+    local SERVICE_NAME="shadow-main"
     
     if [ "$TARGET" = "dev" ]; then
         PANEL_NAME="Developer Panel"
         PORT="3000"
-        SERVICE_NAME="jtg-admin"
+        SERVICE_NAME="shadow-admin"
     fi
 
     print_banner
@@ -982,9 +982,9 @@ install_panel() {
         local OWNER_PASS=""
         local OWNER_PASS2=""
         
-        if [ -n "$JTG_OWNER_USER" ] && [ -n "$JTG_OWNER_PASS" ]; then
-            OWNER_USER="$JTG_OWNER_USER"
-            OWNER_PASS="$JTG_OWNER_PASS"
+        if [ -n "$SHADOW_OWNER_USER" ] && [ -n "$SHADOW_OWNER_PASS" ]; then
+            OWNER_USER="$SHADOW_OWNER_USER"
+            OWNER_PASS="$SHADOW_OWNER_PASS"
         elif [ ! -t 0 ]; then
             OWNER_USER="owner"
             OWNER_PASS="owner12345"
@@ -1018,8 +1018,8 @@ install_panel() {
         echo -e "  ${GRAY}└───${NC}"
         echo ""
         
-        export JTG_OWNER_USER="$OWNER_USER"
-        export JTG_OWNER_PASS="$OWNER_PASS"
+        export SHADOW_OWNER_USER="$OWNER_USER"
+        export SHADOW_OWNER_PASS="$OWNER_PASS"
     fi
     
     # Environment Setup
@@ -1055,12 +1055,12 @@ install_panel() {
         if [ "$TARGET" = "main" ]; then
             execute_step "Owner Account Provisioning" setup_owner
             execute_step "Application Production Build" build_application
-            execute_step "PM2 Background Service Launch" start_panel_node jtg-main
-            execute_step "Application Verification (Port 6767)" health_check 6767 pm2 jtg-main
+            execute_step "PM2 Background Service Launch" start_panel_node shadow-main
+            execute_step "Application Verification (Port 6767)" health_check 6767 pm2 shadow-main
         else
             execute_step "Application Production Build" build_application
-            execute_step "PM2 Background Service Launch" start_panel_node jtg-admin
-            execute_step "Application Verification (Port 3000)" health_check 3000 pm2 jtg-admin
+            execute_step "PM2 Background Service Launch" start_panel_node shadow-admin
+            execute_step "Application Verification (Port 3000)" health_check 3000 pm2 shadow-admin
         fi
     fi
     echo -e "  ${GRAY}│${NC}                                                               ${GRAY}│${NC}"
@@ -1136,8 +1136,8 @@ create_owner_user() {
     echo -e "  ${GRAY}└───${NC}"
     echo ""
     
-    export JTG_OWNER_USER="$OWNER_USER"
-    export JTG_OWNER_PASS="$OWNER_PASS"
+    export SHADOW_OWNER_USER="$OWNER_USER"
+    export SHADOW_OWNER_PASS="$OWNER_PASS"
     execute_step "Setting up Owner Account" setup_owner
     log_success "Owner user setup completed successfully!"
 }
@@ -1149,11 +1149,11 @@ uninstall_panel() {
     elif [ -n "$PANEL_ROOT" ] && [ -f "$PANEL_ROOT/uninstall.sh" ]; then
         bash "$PANEL_ROOT/uninstall.sh" "$@"
         exit 0
-    elif [ -f "/opt/jtg/uninstall.sh" ]; then
-        bash "/opt/jtg/uninstall.sh" "$@"
+    elif [ -f "/opt/shadow/uninstall.sh" ]; then
+        bash "/opt/shadow/uninstall.sh" "$@"
         exit 0
-    elif [ -f "$HOME/Jtg/uninstall.sh" ]; then
-        bash "$HOME/Jtg/uninstall.sh" "$@"
+    elif [ -f "$HOME/Shadow/uninstall.sh" ]; then
+        bash "$HOME/Shadow/uninstall.sh" "$@"
         exit 0
     else
         log_error "uninstall.sh script not found."
@@ -1179,7 +1179,7 @@ while true; do
     echo -e "  ${EMERALD}│${NC}  ${AMBER}${BOLD}[3]${NC}  ${WHITE}${BOLD}Update & Auto-Repair${NC}      ${GRAY}Self-Healing Requirement Check  ${EMERALD}│${NC}"
     echo -e "  ${EMERALD}│${NC}  ${VIOLET}${BOLD}[4]${NC}  ${WHITE}${BOLD}Create / Reset Owner${NC}      ${GRAY}Setup Administrator Account     ${EMERALD}│${NC}"
     echo -e "  ${EMERALD}│${NC}  ${BLUE}${BOLD}[5]${NC}  ${WHITE}${BOLD}System & Service Status${NC}   ${GRAY}Live Port, RAM & Health Monitor ${EMERALD}│${NC}"
-    echo -e "  ${EMERALD}│${NC}  ${RED}${BOLD}[6]${NC}  ${WHITE}${BOLD}Uninstall JTG Panel${NC}       ${GRAY}Clean Removal & Service Wipe   ${EMERALD}│${NC}"
+    echo -e "  ${EMERALD}│${NC}  ${RED}${BOLD}[6]${NC}  ${WHITE}${BOLD}Uninstall SHADOW Panel${NC}       ${GRAY}Clean Removal & Service Wipe   ${EMERALD}│${NC}"
     echo -e "  ${EMERALD}│${NC}  ${GRAY}${BOLD}[0]${NC}  ${WHITE}${BOLD}Exit Installer${NC}            ${GRAY}Close this terminal menu       ${EMERALD}│${NC}"
     echo -e "  ${EMERALD}│${NC}                                                              ${EMERALD}│${NC}"
     echo -e "  ${EMERALD}╰─────────────────────────────────────────────────────────────╯${NC}"

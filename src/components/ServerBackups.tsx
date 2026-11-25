@@ -63,7 +63,7 @@ export default function ServerBackups({ serverId }: { serverId: string }) {
 
   const handleDownload = (filename: string) => {
     try {
-      const token = localStorage.getItem("token") || localStorage.getItem("jtg_token") || "";
+      const token = localStorage.getItem("token") || localStorage.getItem("shadow_token") || "";
       const downloadUrl = `/api/servers/${serverId}/backups/${encodeURIComponent(filename)}${token ? `?token=${encodeURIComponent(token)}` : ""}`;
       const link = document.createElement('a');
       link.href = downloadUrl;

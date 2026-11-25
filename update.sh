@@ -29,7 +29,7 @@ print_banner() {
     fi
     echo -e "
   ${EMERALD}${BOLD}╭──────────────────────────────────────────────────────────────╮
-  │  ${WHITE}██╗████████╗ ██████╗${EMERALD}   ${BOLD}${WHITE}JTG PANEL AUTO-UPDATE & REPAIR${EMERALD}        │
+  │  ${WHITE}██╗████████╗ ██████╗${EMERALD}   ${BOLD}${WHITE}SHADOW PANEL AUTO-UPDATE & REPAIR${EMERALD}        │
   │  ${WHITE}██║╚══██╔══╝██╔════╝${EMERALD}   ${CYAN}Safe Self-Healing System Recovery${EMERALD}              │
   ╰──────────────────────────────────────────────────────────────╯${NC}
 "
@@ -98,7 +98,7 @@ run_root() {
 execute_step() {
     local msg="$1"
     shift
-    local step_id="jtg_upd_$RANDOM"
+    local step_id="shadow_upd_$RANDOM"
     local log_file="/tmp/${step_id}.log"
     rm -f "$log_file"
     
@@ -163,9 +163,9 @@ if [ -d ".git" ]; then
 fi
 
 RUNTIME="Local Node.js"
-if (run_pm2 list 2>/dev/null | grep -qE "jtg-main|jtg-panel"); then
+if (run_pm2 list 2>/dev/null | grep -qE "shadow-main|shadow-panel"); then
     RUNTIME="Local Node.js"
-elif command -v docker &> /dev/null && docker ps -a --format '{{.Names}}' | grep -qE "^jtg-main$"; then
+elif command -v docker &> /dev/null && docker ps -a --format '{{.Names}}' | grep -qE "^shadow-main$"; then
     RUNTIME="Docker"
 fi
 
@@ -202,15 +202,15 @@ echo ""
 # 2. Stop Panel via PM2 First to release file locks & ports
 stop_panel_for_update() {
     # Stop PM2 processes if running
-    run_pm2 stop jtg-main 2>/dev/null || true
-    run_pm2 stop jtg-admin 2>/dev/null || true
-    run_pm2 stop jtg-panel 2>/dev/null || true
+    run_pm2 stop shadow-main 2>/dev/null || true
+    run_pm2 stop shadow-admin 2>/dev/null || true
+    run_pm2 stop shadow-panel 2>/dev/null || true
     
     # Stop Docker container if running
     if command -v docker > /dev/null 2>&1; then
         local DOCKER_CLI=$(get_docker_cmd)
-        $DOCKER_CLI stop jtg-main 2>/dev/null || true
-        $DOCKER_CLI stop jtg-admin 2>/dev/null || true
+        $DOCKER_CLI stop shadow-main 2>/dev/null || true
+        $DOCKER_CLI stop shadow-admin 2>/dev/null || true
     fi
     sleep 1
     return 0
@@ -219,7 +219,7 @@ stop_panel_for_update() {
 execute_step "Stopping panel service (PM2)" stop_panel_for_update
 
 # 3. Create Backup
-BACKUP_DIR=".backup/jtg_backup_$(date +"%Y%m%d_%H%M%S")"
+BACKUP_DIR=".backup/shadow_backup_$(date +"%Y%m%d_%H%M%S")"
 mkdir -p "$BACKUP_DIR"
 
 backup_data() {
@@ -423,7 +423,7 @@ check_and_repair_java() {
                 /usr/lib/jvm/java-11-openjdk-*/bin/java \
                 /usr/lib/jvm/*-openjdk*/bin/java \
                 /opt/java/bin/java \
-                /opt/jtg-java/bin/java \
+                /opt/shadow-java/bin/java \
                 /usr/local/java/bin/java; do
         if [ -x "$cand" ]; then
             echo "Found existing JVM at: $cand"
@@ -520,33 +520,33 @@ check_and_repair_java() {
     if [ -n "$ADOPT_ARCH" ] && command -v curl > /dev/null 2>&1; then
         echo "Attempting fast binary runtime fetch..."
         local JRE_URL="https://api.adoptium.net/v3/binary/latest/21/ga/linux/${ADOPT_ARCH}/jre/hotspot/normal/eclipse"
-        curl -fsSL --connect-timeout 8 --max-time 45 "$JRE_URL" -o /tmp/jtg_jre.tar.gz > /dev/null 2>&1 || true
-        if [ -f "/tmp/jtg_jre.tar.gz" ] && [ -s "/tmp/jtg_jre.tar.gz" ]; then
+        curl -fsSL --connect-timeout 8 --max-time 45 "$JRE_URL" -o /tmp/shadow_jre.tar.gz > /dev/null 2>&1 || true
+        if [ -f "/tmp/shadow_jre.tar.gz" ] && [ -s "/tmp/shadow_jre.tar.gz" ]; then
             if [ "$EUID" -eq 0 ]; then
-                mkdir -p /opt/jtg-java
-                tar -xzf /tmp/jtg_jre.tar.gz -C /opt/jtg-java --strip-components=1 > /dev/null 2>&1 || true
-                if [ -x "/opt/jtg-java/bin/java" ]; then
-                    ln -sf /opt/jtg-java/bin/java /usr/local/bin/java 2>/dev/null || true
+                mkdir -p /opt/shadow-java
+                tar -xzf /tmp/shadow_jre.tar.gz -C /opt/shadow-java --strip-components=1 > /dev/null 2>&1 || true
+                if [ -x "/opt/shadow-java/bin/java" ]; then
+                    ln -sf /opt/shadow-java/bin/java /usr/local/bin/java 2>/dev/null || true
                 fi
             elif command -v sudo > /dev/null 2>&1; then
-                sudo mkdir -p /opt/jtg-java
-                sudo tar -xzf /tmp/jtg_jre.tar.gz -C /opt/jtg-java --strip-components=1 > /dev/null 2>&1 || true
-                if [ -x "/opt/jtg-java/bin/java" ]; then
-                    sudo ln -sf /opt/jtg-java/bin/java /usr/local/bin/java 2>/dev/null || true
+                sudo mkdir -p /opt/shadow-java
+                sudo tar -xzf /tmp/shadow_jre.tar.gz -C /opt/shadow-java --strip-components=1 > /dev/null 2>&1 || true
+                if [ -x "/opt/shadow-java/bin/java" ]; then
+                    sudo ln -sf /opt/shadow-java/bin/java /usr/local/bin/java 2>/dev/null || true
                 fi
             fi
-            rm -f /tmp/jtg_jre.tar.gz 2>/dev/null || true
+            rm -f /tmp/shadow_jre.tar.gz 2>/dev/null || true
             export PATH="/usr/local/bin:$PATH"
             if command -v java > /dev/null 2>&1; then
                 echo "Java OpenJDK runtime installed successfully."
                 return 0
             fi
         fi
-        rm -f /tmp/jtg_jre.tar.gz 2>/dev/null || true
+        rm -f /tmp/shadow_jre.tar.gz 2>/dev/null || true
     fi
 
     # 4. Safe Non-fatal Fallback:
-    # JTG Panel itself runs on Node.js. Dockerized Minecraft instances embed Java automatically in their containers.
+    # SHADOW Panel itself runs on Node.js. Dockerized Minecraft instances embed Java automatically in their containers.
     # Therefore, failure to set up host Java must never freeze or halt the installer.
     echo "Notice: Host Java setup completed with container fallback."
     echo "Note: Docker-managed Minecraft servers will run using containerized Java."
@@ -577,7 +577,7 @@ if ! execute_step "Installing & updating npm packages" install_deps; then
     echo "Restoring from backup..."
     cp -r "$BACKUP_DIR/"* . 2>/dev/null || true
     # Restart panel on previous state
-    run_pm2 start ecosystem.config.cjs --only jtg-main 2>/dev/null || true
+    run_pm2 start ecosystem.config.cjs --only shadow-main 2>/dev/null || true
     exit 1
 fi
 
@@ -596,7 +596,7 @@ if ! execute_step "Building application bundle" build_app; then
     echo "Restoring from backup..."
     cp -r "$BACKUP_DIR/"* . 2>/dev/null || true
     cp -r "$BACKUP_DIR/src_backup/"* src/ 2>/dev/null || true
-    run_pm2 start ecosystem.config.cjs --only jtg-main 2>/dev/null || true
+    run_pm2 start ecosystem.config.cjs --only shadow-main 2>/dev/null || true
     exit 1
 fi
 
@@ -607,7 +607,7 @@ ensure_ecosystem_config() {
 module.exports = {
   apps: [
     {
-      name: "jtg-main",
+      name: "shadow-main",
       script: "npm",
       args: "start",
       instances: 1,
@@ -623,7 +623,7 @@ module.exports = {
       }
     },
     {
-      name: "jtg-admin",
+      name: "shadow-admin",
       script: "npm",
       args: "run dev",
       instances: 1,
@@ -649,7 +649,7 @@ ensure_ecosystem_config
 start_panel_after_update() {
     if [ "$RUNTIME" = "Docker" ]; then
         local COMPOSE_CMD=$(get_compose_cmd)
-        $COMPOSE_CMD up -d --build jtg-main
+        $COMPOSE_CMD up -d --build shadow-main
     else
         # Ensure docker socket permissions for local Minecraft server containers
         if [ -S "/var/run/docker.sock" ]; then
@@ -657,9 +657,9 @@ start_panel_after_update() {
         fi
         
         # Start panel via PM2 cleanly
-        run_pm2 delete jtg-panel >/dev/null 2>&1 || true
-        run_pm2 delete jtg-main >/dev/null 2>&1 || true
-        run_pm2 start ecosystem.config.cjs --only jtg-main
+        run_pm2 delete shadow-panel >/dev/null 2>&1 || true
+        run_pm2 delete shadow-main >/dev/null 2>&1 || true
+        run_pm2 start ecosystem.config.cjs --only shadow-main
         run_pm2 save --force >/dev/null 2>&1 || true
     fi
     return 0
@@ -707,7 +707,7 @@ IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 
 echo ""
 echo -e "  ${GREEN}${BOLD}╭──────────────────────────────────────────────────────────────╮
-  │  ✔  JTG PANEL SUCCESSFULLY UPDATED & VERIFIED                │
+  │  ✔  SHADOW PANEL SUCCESSFULLY UPDATED & VERIFIED                │
   ├──────────────────────────────────────────────────────────────┤${NC}
   │  • Status   : ${GREEN}ONLINE${NC}
   │  • Address  : ${CYAN}http://${IP}:${PANEL_PORT}${NC}

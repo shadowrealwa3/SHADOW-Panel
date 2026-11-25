@@ -24,7 +24,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   const [defaultRuntime, setDefaultRuntime] = useState<string>("docker");
   const [isDevPanel, setIsDevPanel] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      const sim = localStorage.getItem("jtg_simulate_dev_panel");
+      const sim = localStorage.getItem("shadow_simulate_dev_panel");
       if (sim !== null) return sim === "true";
       if (window.location.port === "3000") return true;
       if (window.location.port === "6767") return false;
@@ -36,7 +36,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     setIsDevPanel(prev => {
       const next = !prev;
       if (typeof window !== "undefined") {
-        localStorage.setItem("jtg_simulate_dev_panel", String(next));
+        localStorage.setItem("shadow_simulate_dev_panel", String(next));
       }
       return next;
     });
@@ -62,7 +62,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
       if (res.data.firebaseAppId !== undefined) setFirebaseAppId(res.data.firebaseAppId);
       if (res.data.defaultRuntime !== undefined) setDefaultRuntime(res.data.defaultRuntime);
       if (res.data.isDevPanel !== undefined) {
-        const sim = localStorage.getItem("jtg_simulate_dev_panel");
+        const sim = localStorage.getItem("shadow_simulate_dev_panel");
         if (sim === null && typeof window !== "undefined") {
           if (window.location.port === "6767") {
             setIsDevPanel(false);

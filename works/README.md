@@ -1,8 +1,8 @@
-# JTG Panel — System Architecture & Works Documentation
+# SHADOW Panel — System Architecture & Works Documentation
 
 ## 1. Overview & Architecture
 
-JTG Panel is a modern, high-performance Game Server Management Panel designed for Minecraft and related game servers.
+SHADOW Panel is a modern, high-performance Game Server Management Panel designed for Minecraft and related game servers.
 
 ### Architectural Layers
 - **Frontend**: React 18 with TypeScript, Tailwind CSS, Lucide icons, Socket.IO client, and Axios.
@@ -83,7 +83,7 @@ npm run createuser
 ```
 Or via non-interactive environment variables:
 ```bash
-JTG_OWNER_USER="admin" JTG_OWNER_PASS="YourSecurePassword123" npm run createuser
+SHADOW_OWNER_USER="admin" SHADOW_OWNER_PASS="YourSecurePassword123" npm run createuser
 ```
 
 ### Dev Server

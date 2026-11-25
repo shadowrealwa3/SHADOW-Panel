@@ -319,8 +319,8 @@ router.post("/update", async (req, res) => {
   const fs = await import("fs");
   setTimeout(() => {
     try {
-      const outLog = fs.openSync("/tmp/jtg_update.log", "a");
-      const errLog = fs.openSync("/tmp/jtg_update.log", "a");
+      const outLog = fs.openSync("/tmp/shadow_update.log", "a");
+      const errLog = fs.openSync("/tmp/shadow_update.log", "a");
       const child = spawn("bash", ["update.sh"], {
         detached: true,
         stdio: ["ignore", outLog, errLog],
@@ -340,7 +340,7 @@ router.get("/update-status", async (req, res) => {
 
   try {
     const fs = await import("fs/promises");
-    const logContent = await fs.readFile("/tmp/jtg_update.log", "utf-8");
+    const logContent = await fs.readFile("/tmp/shadow_update.log", "utf-8");
     const lines = logContent.split("\n");
     const recentLines = lines.slice(-40).join("\n");
     res.json({ success: true, logs: recentLines });

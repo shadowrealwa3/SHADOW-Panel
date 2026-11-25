@@ -248,7 +248,7 @@ export const getDocker = async (nodeId?: string): Promise<Docker> => {
 
 export const resolveHostDataDir = async (dockerInstance?: any): Promise<string> => {
   // 1. If explicitly configured with valid host path (and not unexpanded literal ${PWD})
-  const envHost = process.env.JTG_HOST_DATA_PATH;
+  const envHost = process.env.SHADOW_HOST_DATA_PATH;
   if (envHost && !envHost.includes("${PWD}") && envHost !== "/app/.data" && path.isAbsolute(envHost)) {
     return envHost;
   }
@@ -259,9 +259,9 @@ export const resolveHostDataDir = async (dockerInstance?: any): Promise<string> 
     try {
       const candidates = [
         process.env.HOSTNAME || os.hostname(),
-        "jtg-main",
-        "jtg-admin",
-        "jtg-panel"
+        "shadow-main",
+        "shadow-admin",
+        "shadow-panel"
       ];
       for (const name of candidates) {
         if (!name) continue;
@@ -309,7 +309,7 @@ export const getVersions = async (type: string = "PAPER") => {
   if (normalizedType === "PAPER") {
     try {
       const vRes = await axios.get("https://fill.papermc.io/v3/projects/paper", {
-        headers: { "User-Agent": "JTG-Panel/2.0" },
+        headers: { "User-Agent": "SHADOW-Panel/2.0" },
         timeout: 4000
       });
       if (vRes.data?.versions) {
@@ -465,7 +465,7 @@ export const createServerContainer = async (serverData: any, nodeId?: string) =>
   const serverDir = path.join(process.cwd(), ".data", "servers", serverData.id);
   const hostDataDir = await resolveHostDataDir(docker);
   const hostServerDir = path.join(hostDataDir, "servers", serverData.id);
-  const containerBindPath = isLocal ? hostServerDir : `/opt/jtg-panel-node/servers/${serverData.id}`;
+  const containerBindPath = isLocal ? hostServerDir : `/opt/shadow-panel-node/servers/${serverData.id}`;
   await fs.ensureDir(serverDir);
 
   // For Minecraft servers, ensure eula.txt, server.properties and server.jar are in place
@@ -476,7 +476,7 @@ export const createServerContainer = async (serverData: any, nodeId?: string) =>
     }
     const propsPath = path.join(serverDir, "server.properties");
     if (!fs.existsSync(propsPath)) {
-      await fs.writeFile(propsPath, `server-port=${serverData.port}\nquery.port=${serverData.port}\nenable-rcon=true\nrcon.port=${parseInt(serverData.port) + 10}\nrcon.password=admin\nmotd=A Minecraft Server on JTG Panel\n`);
+      await fs.writeFile(propsPath, `server-port=${serverData.port}\nquery.port=${serverData.port}\nenable-rcon=true\nrcon.port=${parseInt(serverData.port) + 10}\nrcon.password=admin\nmotd=A Minecraft Server on SHADOW Panel\n`);
     }
     const jarPath = path.join(serverDir, "server.jar");
     if (!fs.existsSync(jarPath)) {
@@ -569,7 +569,7 @@ export const createServerContainer = async (serverData: any, nodeId?: string) =>
     
     return {
       Image: img,
-      name: `jtg-server-${serverData.id}`,
+      name: `shadow-server-${serverData.id}`,
       Tty: true,
       OpenStdin: true,
       StdinOnce: false,
@@ -600,10 +600,10 @@ export const createServerContainer = async (serverData: any, nodeId?: string) =>
 
   // Ensure any existing container with the same name is removed cleanly
   try {
-    const existing = docker.getContainer(`jtg-server-${serverData.id}`);
+    const existing = docker.getContainer(`shadow-server-${serverData.id}`);
     const inspectInfo = await existing.inspect().catch(() => null);
     if (inspectInfo) {
-      console.log(`[Docker] Removing existing container jtg-server-${serverData.id}...`);
+      console.log(`[Docker] Removing existing container shadow-server-${serverData.id}...`);
       await existing.remove({ force: true }).catch(() => {});
     }
   } catch (e) {}
@@ -669,13 +669,13 @@ export const startContainer = async (containerId: string, nodeId?: string) => {
           const indexPath = path.join(serverDir, "index.js");
           const pkgPath = path.join(serverDir, "package.json");
           if (!fs.existsSync(indexPath)) {
-            await fs.writeFile(indexPath, `// Node.js Application on JTG Panel\nconst http = require('http');\nconst port = process.env.PORT || process.env.SERVER_PORT || ${server.port || 3000};\n\nconsole.log('==============================================');\nconsole.log('🚀 Node.js Application Running on port ' + port);\nconsole.log('Node Version: ' + process.version);\nconsole.log('Upload your files in File Manager to customize!');\nconsole.log('==============================================');\n\nconst app = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'application/json' });\n  res.end(JSON.stringify({ status: 'online', runtime: 'node.js', time: new Date().toISOString() }));\n});\n\napp.listen(port, '0.0.0.0', () => {\n  console.log(\`[Server] Listening on http://0.0.0.0:\${port}\`);\n});\n`);
+            await fs.writeFile(indexPath, `// Node.js Application on SHADOW Panel\nconst http = require('http');\nconst port = process.env.PORT || process.env.SERVER_PORT || ${server.port || 3000};\n\nconsole.log('==============================================');\nconsole.log('🚀 Node.js Application Running on port ' + port);\nconsole.log('Node Version: ' + process.version);\nconsole.log('Upload your files in File Manager to customize!');\nconsole.log('==============================================');\n\nconst app = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'application/json' });\n  res.end(JSON.stringify({ status: 'online', runtime: 'node.js', time: new Date().toISOString() }));\n});\n\napp.listen(port, '0.0.0.0', () => {\n  console.log(\`[Server] Listening on http://0.0.0.0:\${port}\`);\n});\n`);
           }
           if (!fs.existsSync(pkgPath)) {
             await fs.writeFile(pkgPath, JSON.stringify({
               name: (server.name || "node-app").toLowerCase().replace(/[^a-z0-9_-]/g, '-'),
               version: "1.0.0",
-              description: "Node.js app on JTG Panel",
+              description: "Node.js app on SHADOW Panel",
               main: "index.js",
               scripts: { "start": "node index.js" }
             }, null, 2));
@@ -686,7 +686,7 @@ export const startContainer = async (containerId: string, nodeId?: string) => {
           const mainPath = path.join(serverDir, "main.py");
           const reqPath = path.join(serverDir, "requirements.txt");
           if (!fs.existsSync(mainPath)) {
-            await fs.writeFile(mainPath, `# Python Application on JTG Panel\nimport os\nimport sys\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nport = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", ${server.port || 8000})))\nprint("==============================================", flush=True)\nprint("🐍 Python Application Running", flush=True)\nprint(f"Python Version: {sys.version}", flush=True)\nprint(f"Listening Port: {port}", flush=True)\nprint("Upload your files in File Manager to customize!", flush=True)\nprint("==============================================", flush=True)\n\nclass RequestHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header('Content-type', 'application/json')\n        self.end_headers()\n        self.wfile.write(b'{"status": "online", "runtime": "python"}')\n\n    def log_message(self, format, *args):\n        print(f"[{self.log_date_time_string()}] {format % args}", flush=True)\n\nserver = HTTPServer(('0.0.0.0', port), RequestHandler)\nprint(f"[Server] Listening on http://0.0.0.0:{port}", flush=True)\ntry:\n    server.serve_forever()\nexcept KeyboardInterrupt:\n    print("\\nStopping server...", flush=True)\n    server.server_close()\n`);
+            await fs.writeFile(mainPath, `# Python Application on SHADOW Panel\nimport os\nimport sys\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nport = int(os.environ.get("SERVER_PORT", os.environ.get("PORT", ${server.port || 8000})))\nprint("==============================================", flush=True)\nprint("🐍 Python Application Running", flush=True)\nprint(f"Python Version: {sys.version}", flush=True)\nprint(f"Listening Port: {port}", flush=True)\nprint("Upload your files in File Manager to customize!", flush=True)\nprint("==============================================", flush=True)\n\nclass RequestHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header('Content-type', 'application/json')\n        self.end_headers()\n        self.wfile.write(b'{"status": "online", "runtime": "python"}')\n\n    def log_message(self, format, *args):\n        print(f"[{self.log_date_time_string()}] {format % args}", flush=True)\n\nserver = HTTPServer(('0.0.0.0', port), RequestHandler)\nprint(f"[Server] Listening on http://0.0.0.0:{port}", flush=True)\ntry:\n    server.serve_forever()\nexcept KeyboardInterrupt:\n    print("\\nStopping server...", flush=True)\n    server.server_close()\n`);
           }
           if (!fs.existsSync(reqPath)) {
             await fs.writeFile(reqPath, "# Python dependencies\n");
@@ -719,7 +719,7 @@ export const startContainer = async (containerId: string, nodeId?: string) => {
     try {
       const inspectInfo = await container.inspect().catch(() => null);
       if (inspectInfo && inspectInfo.Config && inspectInfo.Config.Env) {
-        const sId = containerId.replace("jtg-server-", "").replace("mock-container-id-", "");
+        const sId = containerId.replace("shadow-server-", "").replace("mock-container-id-", "");
         const propsPath = path.join(process.cwd(), ".data", "servers", sId, "server.properties");
         if (fs.existsSync(propsPath)) {
           const content = await fs.readFile(propsPath, "utf-8");
@@ -767,7 +767,7 @@ export const startContainer = async (containerId: string, nodeId?: string) => {
         }
       }
       console.warn(`[Docker] Falling back to sandbox mode for ${containerId}`);
-      const id = containerId.replace("mock-container-id-", "").replace("jtg-server-", "");
+      const id = containerId.replace("mock-container-id-", "").replace("shadow-server-", "");
       mockState[id] = true;
       mockStartedAt[id] = new Date().toISOString();
       panelEvents.emit("log", id, `[System] Server started in fallback mode (Docker daemon unreachable: ${errStr}).\r\n`);
@@ -796,7 +796,7 @@ export const stopContainer = async (containerId: string, nodeId?: string) => {
       return;
     }
     if (errStr.includes("ECONNREFUSED") || errStr.includes("docker.sock")) {
-      const id = containerId.replace("mock-container-id-", "").replace("jtg-server-", "");
+      const id = containerId.replace("mock-container-id-", "").replace("shadow-server-", "");
       mockState[id] = false;
       delete mockStartedAt[id];
       return;
@@ -825,7 +825,7 @@ export const killContainer = async (containerId: string, nodeId?: string) => {
       return;
     }
     if (errStr.includes("ECONNREFUSED") || errStr.includes("docker.sock")) {
-      const id = containerId.replace("mock-container-id-", "").replace("jtg-server-", "");
+      const id = containerId.replace("mock-container-id-", "").replace("shadow-server-", "");
       mockState[id] = false;
       delete mockStartedAt[id];
       return;
@@ -868,7 +868,7 @@ export const restartContainer = async (containerId: string, nodeId?: string) => 
           return;
         } catch (_) {}
       }
-      const id = containerId.replace("mock-container-id-", "").replace("jtg-server-", "");
+      const id = containerId.replace("mock-container-id-", "").replace("shadow-server-", "");
       mockState[id] = true;
       mockStartedAt[id] = new Date().toISOString();
       panelEvents.emit("log", id, `[System] Server restarted in fallback mode (Docker unreachable).\r\n`);
@@ -914,7 +914,7 @@ export const getContainerStatus = async (containerId: string, nodeId?: string) =
   } catch (e: any) {
     const msg = String(e?.message || e);
     if (msg.includes("ECONNREFUSED") || msg.includes("docker.sock")) {
-      const id = (containerId || "").replace("jtg-server-", "");
+      const id = (containerId || "").replace("shadow-server-", "");
       const isRunning = mockState[id] || false;
       return { State: { Running: isRunning, Status: isRunning ? "running" : "exited", StartedAt: isRunning ? (mockStartedAt[id] || new Date().toISOString()) : null } };
     }

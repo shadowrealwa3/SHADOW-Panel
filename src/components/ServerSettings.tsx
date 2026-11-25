@@ -252,7 +252,7 @@ export default function ServerSettings({ serverId, server }: { serverId: string,
                           setMigrationMessage(null);
                           setShowMigrateConfirm(false);
                           try {
-                            const token = localStorage.getItem("jtg_token") || localStorage.getItem("token");
+                            const token = localStorage.getItem("shadow_token") || localStorage.getItem("token");
                             const headers: any = {};
                             if (token) headers["Authorization"] = `Bearer ${token}`;
                             const res = await axios.put(`/api/servers/${serverId}/migrate-runtime`, { targetRuntime: target }, { headers });

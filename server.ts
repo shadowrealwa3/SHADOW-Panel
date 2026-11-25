@@ -41,7 +41,7 @@ io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) return next(new Error("Authentication error"));
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET || "jtg-panel-super-secret");
+    const verified = jwt.verify(token, process.env.JWT_SECRET || "shadow-panel-super-secret");
     (socket as any).user = verified;
     next();
   } catch (err) {
@@ -95,8 +95,8 @@ app.use("/api", apiRoutes);
 import { initSFTPServer } from "./src/server/services/sftp.js";
 
 async function ensureOwnerFromEnv() {
-  const envUser = process.env.JTG_OWNER_USER;
-  const envPass = process.env.JTG_OWNER_PASS;
+  const envUser = process.env.SHADOW_OWNER_USER;
+  const envPass = process.env.SHADOW_OWNER_PASS;
   if (!envUser || !envPass) return;
 
   try {
@@ -126,9 +126,9 @@ async function ensureOwnerFromEnv() {
       });
     }
     await fs.writeJson(usersFile, users, { spaces: 2 });
-    console.log(`[JTG] Owner user '${envUser}' ensured in database.`);
+    console.log(`[SHADOW] Owner user '${envUser}' ensured in database.`);
   } catch (err) {
-    console.error("[JTG] Failed to ensure owner from environment:", err);
+    console.error("[SHADOW] Failed to ensure owner from environment:", err);
   }
 }
 
@@ -151,7 +151,7 @@ async function startServer() {
   }
 
   httpServer.listen(PORT, "0.0.0.0", () => {
-    console.log(`JTG Panel running on port ${PORT}`);
+    console.log(`SHADOW Panel running on port ${PORT}`);
   });
 }
 
